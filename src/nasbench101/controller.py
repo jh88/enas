@@ -8,8 +8,8 @@ from src.utils import get_train_ops
 class Controller():
     def __init__(
         self,
-        num_branches=4, # number of possible operations
-        num_cells=7, # number of nodes except the input node
+        num_branches=3, # number of possible operations
+        num_cells=5, # number of nodes excluding the input and output nodes
         lstm_size=32,
         lstm_num_layers=2, # number of lstm layers in the controller 
         tanh_constant=None,
@@ -68,7 +68,7 @@ class Controller():
             with tf.variable_scope('lstm'):
                 self.w_lstm = []
                 for layer_id in range(self.lstm_num_layers):
-                    with tf.variable_scope(f'layer_{layer_id}'):
+                    with tf.variable_scope('layer_{}'.format(layer_id)):
                         w = tf.get_variable(
                             'w', [2 * self.lstm_size, 4 * self.lstm_size]
                         )
@@ -247,9 +247,9 @@ class Controller():
 
         return arc_seq, entropy, log_prob, last_c, last_h
 
-    def build_trainer(self, nasbench):
-        self.reward = tf.to_float(nasbench.get_acc())
-        self.reward = self.valid_acc
+    def build_trainer(self, child_model):
+        child_model.build_valid_rl()
+        self.reward = tf.to_float(child_model.accuracy)
 
         if self.entropy_weight:
             self.reward += self.entropy_weight * self.sample_entropy

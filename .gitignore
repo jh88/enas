@@ -2,6 +2,7 @@ outputs*
 outputs/*
 *.swp
 *.pyc
+*.tfrecord
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
